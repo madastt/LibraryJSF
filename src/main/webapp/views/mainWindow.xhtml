@@ -2,13 +2,57 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html">
-<h:head>
-    <title>Biblioteka - Strona główna</title>
-</h:head>
-<h:body style="font-family: Arial, sans-serif; margin: 40px;">
-    <h1>Witaj w Bibliotece!</h1>
-    <p>Zalogowany użytkownik: <b>#{request.remoteUser}</b></p>
-    <p><h:link value="Wyloguj się" outcome="/logoutWindow"/></p>
-</h:body>
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<f:view locale="#{librarySessionBean.locale}">
+    <h:head>
+        <title>#{msgs.appTitle}</title>
+        <h:outputStylesheet library="css" name="styles.css"/>
+    </h:head>
+    <h:body>
+        <h:form>
+            <div class="card">
+                <h1>#{msgs.welcome}</h1>
+                <p>
+                    #{msgs.loggedUser}: <b>#{request.remoteUser}</b> |
+                    <h:commandButton value="#{msgs.langPolish}" action="#{librarySessionBean.changeLanguage('pl')}"/>
+                    <h:commandButton value="#{msgs.langEnglish}" action="#{librarySessionBean.changeLanguage('en')}"/>
+                    |
+                    <h:commandButton value="#{msgs.logout}" action="#{librarySessionBean.logout()}"/>
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>Nawigacja (faces-config.xml: aliasy, dynamiczna i warunkowa &lt;if&gt;)</h3>
+                <div class="nav-bar">
+                    <h:commandButton value="#{msgs.navCollection}" action="goCollection"/>
+                    <h:commandButton value="#{msgs.navAjax}" action="goAjax"/>
+                    <h:commandButton value="#{msgs.navDatabase}" action="goDatabase"/>
+                </div>
+                <p>
+                    Wybór widoku (1 = Kolekcja, 2 = AJAX, 3 = Baza MSSQL):
+                    <h:selectOneMenu value="#{librarySessionBean.navigationChoice}">
+                        <f:selectItem itemValue="1" itemLabel="1 - #{msgs.navCollection}"/>
+                        <f:selectItem itemValue="2" itemLabel="2 - #{msgs.navAjax}"/>
+                        <f:selectItem itemValue="3" itemLabel="3 - #{msgs.navDatabase}"/>
+                    </h:selectOneMenu>
+                    <h:commandButton value="#{msgs.navRandom}" action="conditionalNav"/>
+                    <h:commandButton value="Nawigacja dynamiczna (metoda)" action="#{librarySessionBean.getDynamicTarget()}"/>
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>Współpraca komponentów zarządzanych (XML + Application + Session + View + @Inject)</h3>
+                <ul>
+                    <li><b>faces-config.xml (AppInfoXmlBean):</b> #{appInfoXmlBean.student} — #{appInfoXmlBean.projectTitle} (#{appInfoXmlBean.appVersion})</li>
+                    <li><b>ApplicationScoped:</b> #{libraryApplicationBean.libraryName} (v#{libraryApplicationBean.applicationVersion}), globalne akcje: <b>#{libraryApplicationBean.totalActions}</b></li>
+                    <li><b>SessionScoped + @Inject(Application):</b> #{librarySessionBean.appInfoFromInjectedBean}</li>
+                    <li><b>ViewScoped (współpraca z Session i Application):</b> #{libraryViewBean.combinedSummary}</li>
+                </ul>
+                <h:commandButton value="Wykonaj akcję na widoku (+1 View i +1 Application)"
+                                 action="#{libraryViewBean.recordViewAction()}"/>
+            </div>
+        </h:form>
+    </h:body>
+</f:view>
 </html>

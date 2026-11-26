@@ -35,4 +35,43 @@
         </managed-property>
     </managed-bean>
 
+    <navigation-rule>
+        <description>Reguły nawigacji aplikacji Biblioteka</description>
+        <from-view-id>*</from-view-id>
+
+        <navigation-case>
+            <from-outcome>goMain</from-outcome>
+            <to-view-id>/views/mainWindow.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>goCollection</from-outcome>
+            <to-view-id>/views/collectionTable.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>goAjax</from-outcome>
+            <to-view-id>/views/ajaxTable.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>goDatabase</from-outcome>
+            <to-view-id>/views/dbBooks.xhtml</to-view-id>
+        </navigation-case>
+
+        <!-- Reguły warunkowe (if) na podstawie pola w LibrarySessionBean -->
+        <navigation-case>
+            <from-outcome>conditionalNav</from-outcome>
+            <if>#{librarySessionBean.navigationChoice == 1}</if>
+            <to-view-id>/views/collectionTable.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>conditionalNav</from-outcome>
+            <if>#{librarySessionBean.navigationChoice == 2}</if>
+            <to-view-id>/views/ajaxTable.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>conditionalNav</from-outcome>
+            <if>#{librarySessionBean.navigationChoice == 3}</if>
+            <to-view-id>/views/dbBooks.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+
 </faces-config>
