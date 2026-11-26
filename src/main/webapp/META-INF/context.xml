@@ -5,4 +5,8 @@
            dataSourceName="jdbc/bibliotekaAuth"
            userTable="users" userNameCol="user_name" userCredCol="user_pass"
            userRoleTable="user_roles" roleNameCol="role_name"/>
+
+    <ResourceLink name="jdbc/bibliotekaData"
+                  global="jdbc/bibliotekaData"
+                  type="javax.sql.DataSource"/>
 </Context>

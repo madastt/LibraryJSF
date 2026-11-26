@@ -6,13 +6,97 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 <f:view locale="#{librarySessionBean.locale}">
     <h:head>
-        <title>#{msgs.appTitle}</title>
+        <title>#{msgs.navDatabase}</title>
         <h:outputStylesheet library="css" name="styles.css"/>
     </h:head>
     <h:body>
-        <h2>Widok tymczasowy (do uzupełnienia)</h2>
-        <h:form>
-            <h:commandButton value="#{msgs.navMain}" action="goMain"/>
+        <h:form id="navForm">
+            <div class="card">
+                <h2>#{msgs.navDatabase}</h2>
+                <p>
+                    #{msgs.loggedUser}: <b>#{request.remoteUser}</b> |
+                    <h:commandButton value="#{msgs.navMain}" action="goMain"/>
+                    <h:commandButton value="#{msgs.navCollection}" action="goCollection"/>
+                    <h:commandButton value="#{msgs.navAjax}" action="goAjax"/>
+                    <h:commandButton value="#{msgs.logout}" action="#{librarySessionBean.logout()}"/>
+                </p>
+            </div>
+        </h:form>
+
+        <h:form id="dbForm">
+            <div class="card">
+                <p>
+                    Baza danych: <b>BibliotekaData (MSSQL / JNDI: jdbc/bibliotekaData)</b> |
+                    Liczba rekordów w bazie (odczyt z ApplicationScoped przez DAO/TO):
+                    <b>#{libraryApplicationBean.databaseBooksCount}</b>
+                </p>
+
+                <h3>Dodaj nową książkę do bazy MSSQL</h3>
+                <p>
+                    #{msgs.colTitle}: <h:inputText value="#{librarySessionBean.newDbBook.title}" size="22"/>
+                    #{msgs.colAuthor}: <h:inputText value="#{librarySessionBean.newDbBook.author}" size="20"/>
+                    #{msgs.colYear}: <h:inputText value="#{librarySessionBean.newDbBook.year}" size="6"/>
+                    #{msgs.colAvailable}: <h:selectBooleanCheckbox value="#{librarySessionBean.newDbBook.available}"/>
+                    <h:commandButton value="+ #{msgs.btnAdd}">
+                        <f:ajax listener="#{librarySessionBean.dbAddBook()}" execute="@form" render="@form"/>
+                    </h:commandButton>
+                </p>
+
+                <h:dataTable value="#{librarySessionBean.dbBooks}" var="book"
+                             border="2" cellspacing="2" cellpadding="6"
+                             rowClasses="oddRow,evenRow" style="width: 100%;">
+                    <h:column>
+                        <f:facet name="header">#{msgs.colId}</f:facet>
+                        <h:outputText value="#{book.id}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colTitle}</f:facet>
+                        <h:inputText value="#{book.title}" rendered="#{book.edited}"/>
+                        <h:outputText value="#{book.title}" rendered="#{not book.edited}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colAuthor}</f:facet>
+                        <h:inputText value="#{book.author}" rendered="#{book.edited}"/>
+                        <h:outputText value="#{book.author}" rendered="#{not book.edited}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colYear}</f:facet>
+                        <h:inputText value="#{book.year}" size="6" rendered="#{book.edited}"/>
+                        <h:outputText value="#{book.year}" rendered="#{not book.edited}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colAvailable}</f:facet>
+                        <h:selectBooleanCheckbox value="#{book.available}" rendered="#{book.edited}"/>
+                        <h:outputText value="#{book.available ? 'TAK' : 'NIE'}" rendered="#{not book.edited}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colOperation}</f:facet>
+                        <h:selectBooleanCheckbox value="#{book.edited}">
+                            <f:ajax listener="#{librarySessionBean.dbToggleEdit(book)}"
+                                    execute="@form" render="@form"/>
+                        </h:selectBooleanCheckbox>
+                        <h:commandButton value="#{msgs.btnDelete}">
+                            <f:ajax listener="#{librarySessionBean.dbDeleteBook(book)}"
+                                    execute="@form" render="@form"/>
+                        </h:commandButton>
+                    </h:column>
+                </h:dataTable>
+
+                <p style="margin-top: 12px;">
+                    <h:commandButton value="#{msgs.btnSave}">
+                        <f:ajax listener="#{librarySessionBean.dbSaveAll()}" execute="@form" render="@form"/>
+                    </h:commandButton>
+                    <h:commandButton value="#{msgs.btnRefresh}">
+                        <f:ajax listener="#{librarySessionBean.refreshDbBooks()}" execute="@form" render="@form"/>
+                    </h:commandButton>
+                </p>
+                <h:messages styleClass="errorMessage"/>
+            </div>
         </h:form>
     </h:body>
 </f:view>

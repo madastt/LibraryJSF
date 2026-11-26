@@ -10,6 +10,8 @@ import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
+
+import pl.biblioteka.dao.BookDAO;
 import pl.biblioteka.to.BookTO;
 import java.util.Collections;
 import java.util.Comparator;
@@ -90,10 +92,15 @@ public class LibrarySessionBean implements Serializable {
 
     private List<BookTO> collectionBooks = new ArrayList<>();
     private long nextCollectionId = 4L;
+
+    private List<BookTO> dbBooks = new ArrayList<>();
+    private BookTO newDbBook = new BookTO();
+
     @PostConstruct
     public void init() {
         refreshCollectionData();
         refreshAjaxData();
+        refreshDbBooks();
     }
     public List<BookTO> getCollectionBooks() {
         return collectionBooks;
@@ -203,6 +210,54 @@ public class LibrarySessionBean implements Serializable {
             return "asc".equals(dir) ? t1.compareToIgnoreCase(t2) : t2.compareToIgnoreCase(t1);
         };
         Collections.sort(ajaxBooks, comparator);
+        applicationBean.incrementTotalActions();
+    }
+
+    public List<BookTO> getDbBooks() {
+        return dbBooks;
+    }
+    public void setDbBooks(List<BookTO> dbBooks) {
+        this.dbBooks = dbBooks;
+    }
+    public BookTO getNewDbBook() {
+        return newDbBook;
+    }
+    public void setNewDbBook(BookTO newDbBook) {
+        this.newDbBook = newDbBook;
+    }
+    public void refreshDbBooks() {
+        dbBooks = new BookDAO().findAll();
+    }
+    public void dbAddBook() {
+        if (newDbBook.getTitle() != null && !newDbBook.getTitle().trim().isEmpty()) {
+            new BookDAO().create(newDbBook);
+            newDbBook = new BookTO();
+            refreshDbBooks();
+            applicationBean.incrementTotalActions();
+        }
+    }
+    public void dbToggleEdit(BookTO book) {
+        // Gdy użytkownik odznacza checkbox edycji -> automatyczny zapis (UPDATE) do MSSQL
+        if (!book.isEdited()) {
+            new BookDAO().update(book);
+            refreshDbBooks();
+            applicationBean.incrementTotalActions();
+        }
+    }
+    public void dbSaveAll() {
+        BookDAO dao = new BookDAO();
+        for (BookTO book : dbBooks) {
+            if (book.isEdited()) {
+                dao.update(book);
+                book.setEdited(false);
+            }
+        }
+        refreshDbBooks();
+        applicationBean.incrementTotalActions();
+    }
+    public void dbDeleteBook(BookTO book) {
+        new BookDAO().delete(book.getId());
+        refreshDbBooks();
         applicationBean.incrementTotalActions();
     }
 }

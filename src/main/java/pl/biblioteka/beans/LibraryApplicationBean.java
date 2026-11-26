@@ -1,8 +1,12 @@
 package pl.biblioteka.beans;
 
+import pl.biblioteka.dao.BookDAO;
+import pl.biblioteka.to.BookTO;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import java.io.Serializable;
+import java.util.List;
 
 @Named(value = "libraryApplicationBean")
 @ApplicationScoped
@@ -42,5 +46,10 @@ public class LibraryApplicationBean implements Serializable {
 
     public void setTotalActions(int totalActions) {
         this.totalActions = totalActions;
+    }
+
+    public int getDatabaseBooksCount() {
+        List<BookTO> books = new BookDAO().findAll();
+        return books.size();
     }
 }
