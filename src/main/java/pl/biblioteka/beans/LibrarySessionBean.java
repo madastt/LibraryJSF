@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import pl.biblioteka.to.BookTO;
+import java.util.Collections;
+import java.util.Comparator;
+
 
 @Named(value = "librarySessionBean")
 @SessionScoped
@@ -90,6 +93,7 @@ public class LibrarySessionBean implements Serializable {
     @PostConstruct
     public void init() {
         refreshCollectionData();
+        refreshAjaxData();
     }
     public List<BookTO> getCollectionBooks() {
         return collectionBooks;
@@ -133,5 +137,72 @@ public class LibrarySessionBean implements Serializable {
         collectionBooks.add(new BookTO(3L, "Rok 1984", "George Orwell", 1949, false, false));
         nextCollectionId = 4L;
         return "";
+    }
+    private List<BookTO> ajaxBooks = new ArrayList<>();
+    private long nextAjaxId = 5L;
+
+
+
+    public List<BookTO> getAjaxBooks() {
+        return ajaxBooks;
+    }
+
+    public void setAjaxBooks(List<BookTO> ajaxBooks) {
+        this.ajaxBooks = ajaxBooks;
+    }
+
+    public void refreshAjaxData() {
+        ajaxBooks.clear();
+        ajaxBooks.add(new BookTO(1L, "Władca Pierścieni", "J.R.R. Tolkien", 1954, true, false));
+        ajaxBooks.add(new BookTO(2L, "Mistrz i Małgorzata", "Michaił Bułhakow", 1967, true, false));
+        ajaxBooks.add(new BookTO(3L, "Zbrodnia i kara", "Fiodor Dostojewski", 1866, false, false));
+        ajaxBooks.add(new BookTO(4L, "Mały Książę", "Antoine de Saint-Exupéry", 1943, true, false));
+        nextAjaxId = 5L;
+    }
+
+    public void ajaxToggleEdit(BookTO book) {
+        int idx = ajaxBooks.indexOf(book);
+        if (idx >= 0) {
+            ajaxBooks.set(idx, book);
+            applicationBean.incrementTotalActions();
+        }
+    }
+
+    public void ajaxAddRow(BookTO afterBook) {
+        int idx = ajaxBooks.indexOf(afterBook);
+        BookTO newBook = new BookTO(nextAjaxId++, "", "", 2026, true, true);
+        if (idx >= 0) {
+            ajaxBooks.add(idx + 1, newBook);
+        } else {
+            ajaxBooks.add(newBook);
+        }
+        applicationBean.incrementTotalActions();
+    }
+
+    public void ajaxAddRowAtEnd() {
+        ajaxBooks.add(new BookTO(nextAjaxId++, "", "", 2026, true, true));
+        applicationBean.incrementTotalActions();
+    }
+
+    public void ajaxDeleteRow(BookTO book) {
+        ajaxBooks.remove(book);
+        applicationBean.incrementTotalActions();
+    }
+
+    public void ajaxSaveAll() {
+        for (BookTO b : ajaxBooks) {
+            b.setEdited(false);
+        }
+        applicationBean.incrementTotalActions();
+    }
+
+    public void ajaxSortByTitle(String dir) {
+        Comparator<BookTO> comparator = (a, b) -> {
+            String t1 = a.getTitle() == null ? "" : a.getTitle();
+            String t2 = b.getTitle() == null ? "" : b.getTitle();
+            return "asc".equals(dir) ? t1.compareToIgnoreCase(t2) : t2.compareToIgnoreCase(t1);
+        };
+        Collections.sort(ajaxBooks, comparator);
+        applicationBean.incrementTotalActions();
     }
 }

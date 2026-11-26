@@ -6,13 +6,100 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 <f:view locale="#{librarySessionBean.locale}">
     <h:head>
-        <title>#{msgs.appTitle}</title>
+        <title>#{msgs.navAjax}</title>
         <h:outputStylesheet library="css" name="styles.css"/>
     </h:head>
     <h:body>
-        <h2>Widok tymczasowy (do uzupełnienia)</h2>
-        <h:form>
-            <h:commandButton value="#{msgs.navMain}" action="goMain"/>
+        <h:form id="navForm">
+            <div class="card">
+                <h2>#{msgs.navAjax}</h2>
+                <p>
+                    #{msgs.loggedUser}: <b>#{request.remoteUser}</b> |
+                    <h:commandButton value="#{msgs.navMain}" action="goMain"/>
+                    <h:commandButton value="#{msgs.navCollection}" action="goCollection"/>
+                    <h:commandButton value="#{msgs.navDatabase}" action="goDatabase"/>
+                    <h:commandButton value="#{msgs.logout}" action="#{librarySessionBean.logout()}"/>
+                </p>
+            </div>
+        </h:form>
+
+        <h:form id="ajaxForm">
+            <div class="card">
+                <p style="font-size: 13px; color: #555;">
+                    Wszystkie operacje poniżej działają asynchronicznie przez <b>&lt;f:ajax&gt;</b> bez przeładowania strony.
+                    Licznik akcji (ApplicationScoped): <b>#{libraryApplicationBean.totalActions}</b>
+                </p>
+
+                <h:dataTable value="#{librarySessionBean.ajaxBooks}" var="book"
+                             border="2" cellspacing="2" cellpadding="6"
+                             rowClasses="oddRow,evenRow" style="width: 100%;">
+                    <h:column>
+                        <f:facet name="header">#{msgs.colId}</f:facet>
+                        <h:outputText value="#{book.id}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">
+                            #{msgs.colTitle}
+                            <h:commandButton value="&#8659;">
+                                <f:ajax listener="#{librarySessionBean.ajaxSortByTitle('asc')}" render="@form"/>
+                            </h:commandButton>
+                            <h:commandButton value="&#8657;">
+                                <f:ajax listener="#{librarySessionBean.ajaxSortByTitle('desc')}" render="@form"/>
+                            </h:commandButton>
+                        </f:facet>
+                        <h:inputText value="#{book.title}" rendered="#{book.edited}"/>
+                        <h:outputText value="#{book.title}" rendered="#{not book.edited}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colAuthor}</f:facet>
+                        <h:inputText value="#{book.author}" rendered="#{book.edited}"/>
+                        <h:outputText value="#{book.author}" rendered="#{not book.edited}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colYear}</f:facet>
+                        <h:inputText value="#{book.year}" size="6" rendered="#{book.edited}"/>
+                        <h:outputText value="#{book.year}" rendered="#{not book.edited}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colAvailable}</f:facet>
+                        <h:selectBooleanCheckbox value="#{book.available}" rendered="#{book.edited}"/>
+                        <h:outputText value="#{book.available ? 'TAK' : 'NIE'}" rendered="#{not book.edited}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colOperation}</f:facet>
+                        <h:selectBooleanCheckbox value="#{book.edited}">
+                            <f:ajax listener="#{librarySessionBean.ajaxToggleEdit(book)}"
+                                    execute="@form" render="@form"/>
+                        </h:selectBooleanCheckbox>
+                        <h:commandButton value="+">
+                            <f:ajax listener="#{librarySessionBean.ajaxAddRow(book)}"
+                                    execute="@form" render="@form"/>
+                        </h:commandButton>
+                        <h:commandButton value="-">
+                            <f:ajax listener="#{librarySessionBean.ajaxDeleteRow(book)}"
+                                    execute="@form" render="@form"/>
+                        </h:commandButton>
+                    </h:column>
+                </h:dataTable>
+
+                <p style="margin-top: 12px;">
+                    <h:commandButton value="#{msgs.btnSave}">
+                        <f:ajax listener="#{librarySessionBean.ajaxSaveAll()}" execute="@form" render="@form"/>
+                    </h:commandButton>
+                    <h:commandButton value="#{msgs.btnRefresh}">
+                        <f:ajax listener="#{librarySessionBean.refreshAjaxData()}" execute="@form" render="@form"/>
+                    </h:commandButton>
+                    <h:commandButton value="+ #{msgs.btnAdd}">
+                        <f:ajax listener="#{librarySessionBean.ajaxAddRowAtEnd()}" execute="@form" render="@form"/>
+                    </h:commandButton>
+                </p>
+                <h:messages styleClass="errorMessage"/>
+            </div>
         </h:form>
     </h:body>
 </f:view>
