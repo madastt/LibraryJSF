@@ -7,8 +7,8 @@
     <title>Wylogowanie</title>
 </h:head>
 <h:body style="font-family: Arial, sans-serif; margin: 40px;">
-    <h2 style="color: darkred;">Zostałeś wylogowany. Sesja została zakończona.</h2>
+    <h2 style="color: darkred;">#{msgs.logout}</h2>
     #{session.invalidate()}
-    <p><h:link value="Zaloguj się ponownie" outcome="/views/mainWindow"/></p>
+    <p><h:button value="#{msgs.backToMain}" outcome="/views/mainWindow"/></p>
 </h:body>
 </html>

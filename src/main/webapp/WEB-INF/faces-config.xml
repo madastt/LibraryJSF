@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config version="2.2"
+              xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd">
+
+    <application>
+        <resource-bundle>
+            <base-name>messages</base-name>
+            <var>msgs</var>
+        </resource-bundle>
+        <locale-config>
+            <default-locale>pl</default-locale>
+            <supported-locale>pl</supported-locale>
+            <supported-locale>en</supported-locale>
+        </locale-config>
+    </application>
+
+    <managed-bean>
+        <description>Komponent konfigurowany i inicjalizowany w faces-config.xml</description>
+        <managed-bean-name>appInfoXmlBean</managed-bean-name>
+        <managed-bean-class>pl.biblioteka.beans.AppInfoXmlBean</managed-bean-class>
+        <managed-bean-scope>application</managed-bean-scope>
+        <managed-property>
+            <property-name>student</property-name>
+            <value>Marcin Starzyk</value>
+        </managed-property>
+        <managed-property>
+            <property-name>projectTitle</property-name>
+            <value>System Zarządzania Biblioteką (TAI)</value>
+        </managed-property>
+        <managed-property>
+            <property-name>appVersion</property-name>
+            <value>1.0-XML-INIT</value>
+        </managed-property>
+    </managed-bean>
+
+</faces-config>

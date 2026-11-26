@@ -13,22 +13,22 @@
             pt:action="#{facesContext.externalContext.encodeActionURL('j_security_check')}">
         <table>
             <tr>
-                <td>Użytkownik:</td>
+                <td>#{msgs.username}:</td>
                 <td><h:inputText pt:name="j_username" id="j_username" value="" size="20"/></td>
             </tr>
             <tr>
-                <td>Hasło:</td>
+                <td>#{msgs.password}:</td>
                 <td><h:inputSecret pt:name="j_password" id="j_password" value="" size="20"/></td>
             </tr>
             <tr>
                 <td colspan="2" style="padding-top: 10px;">
-                    <input type="submit" value="Zaloguj"/>
+                    <input type="submit" value="#{msgs.logon}"/>
                 </td>
             </tr>
         </table>
     </h:form>
     <p style="color: gray; font-size: 12px;">
-        Konta testowe z bazy BibliotekaAuth: <b>admin / admin</b> lub <b>czytelnik / czytelnik</b>
+        #{appInfoXmlBean.projectTitle} — #{appInfoXmlBean.student} (#{appInfoXmlBean.appVersion})
     </p>
 </h:body>
 </html>

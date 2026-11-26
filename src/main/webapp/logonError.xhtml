@@ -7,7 +7,7 @@
     <title>Błąd logowania</title>
 </h:head>
 <h:body style="font-family: Arial, sans-serif; margin: 40px;">
-    <h2 style="color: red;">Błędny login lub hasło!</h2>
-    <p><h:link value="Spróbuj ponownie" outcome="/views/mainWindow"/></p>
+    <h2 style="color: red;">#{msgs.logonError}</h2>
+    <p><h:link value="#{msgs.backToMain}" outcome="/views/mainWindow"/></p>
 </h:body>
 </html>
