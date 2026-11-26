@@ -6,13 +6,71 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 <f:view locale="#{librarySessionBean.locale}">
     <h:head>
-        <title>#{msgs.appTitle}</title>
+        <title>#{msgs.navCollection}</title>
         <h:outputStylesheet library="css" name="styles.css"/>
     </h:head>
     <h:body>
-        <h2>Widok tymczasowy (do uzupełnienia)</h2>
         <h:form>
-            <h:commandButton value="#{msgs.navMain}" action="goMain"/>
+            <div class="card">
+                <h2>#{msgs.navCollection}</h2>
+                <p>
+                    #{msgs.loggedUser}: <b>#{request.remoteUser}</b> |
+                    <h:commandButton value="#{msgs.navMain}" action="goMain"/>
+                    <h:commandButton value="#{msgs.navAjax}" action="goAjax"/>
+                    <h:commandButton value="#{msgs.navDatabase}" action="goDatabase"/>
+                    <h:commandButton value="#{msgs.logout}" action="#{librarySessionBean.logout()}"/>
+                </p>
+            </div>
+
+            <div class="card">
+                <h:dataTable value="#{librarySessionBean.collectionBooks}" var="book"
+                             border="2" cellspacing="2" cellpadding="6"
+                             rowClasses="oddRow,evenRow" style="width: 100%;">
+                    <h:column>
+                        <f:facet name="header">#{msgs.colId}</f:facet>
+                        <h:outputText value="#{book.id}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colTitle}</f:facet>
+                        <h:inputText value="#{book.title}" rendered="#{book.edited}"/>
+                        <h:outputText value="#{book.title}" rendered="#{not book.edited}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colAuthor}</f:facet>
+                        <h:inputText value="#{book.author}" rendered="#{book.edited}"/>
+                        <h:outputText value="#{book.author}" rendered="#{not book.edited}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colYear}</f:facet>
+                        <h:inputText value="#{book.year}" size="6" rendered="#{book.edited}"/>
+                        <h:outputText value="#{book.year}" rendered="#{not book.edited}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colAvailable}</f:facet>
+                        <h:selectBooleanCheckbox value="#{book.available}" rendered="#{book.edited}"/>
+                        <h:outputText value="#{book.available ? 'TAK' : 'NIE'}" rendered="#{not book.edited}"/>
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">#{msgs.colOperation}</f:facet>
+                        <h:selectBooleanCheckbox value="#{book.edited}" onclick="submit()"/>
+                        <h:commandButton value="#{msgs.btnAdd}" action="#{librarySessionBean.addCollectionRow(book)}"/>
+                        <h:commandButton value="#{msgs.btnModify}" action="#{librarySessionBean.modifyCollectionRow(book)}"/>
+                        <h:commandButton value="#{msgs.btnDelete}" action="#{librarySessionBean.deleteCollectionRow(book)}"/>
+                    </h:column>
+                </h:dataTable>
+
+                <p style="margin-top: 12px;">
+                    <h:commandButton value="#{msgs.btnSave}" action="#{librarySessionBean.saveCollectionData()}"/>
+                    <h:commandButton value="#{msgs.btnRefresh}" action="#{librarySessionBean.refreshCollectionData()}"/>
+                    <h:commandButton value="+ #{msgs.btnAdd}" action="#{librarySessionBean.addCollectionRowAtEnd()}"/>
+                </p>
+                <h:messages styleClass="errorMessage"/>
+            </div>
         </h:form>
     </h:body>
 </f:view>

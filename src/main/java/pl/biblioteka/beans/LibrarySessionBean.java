@@ -7,6 +7,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.PostConstruct;
+import pl.biblioteka.to.BookTO;
 
 @Named(value = "librarySessionBean")
 @SessionScoped
@@ -79,5 +83,55 @@ public class LibrarySessionBean implements Serializable {
 
     public void setNavigationChoice(int navigationChoice) {
         this.navigationChoice = navigationChoice;
+    }
+
+    private List<BookTO> collectionBooks = new ArrayList<>();
+    private long nextCollectionId = 4L;
+    @PostConstruct
+    public void init() {
+        refreshCollectionData();
+    }
+    public List<BookTO> getCollectionBooks() {
+        return collectionBooks;
+    }
+    public void setCollectionBooks(List<BookTO> collectionBooks) {
+        this.collectionBooks = collectionBooks;
+    }
+    public String addCollectionRow(BookTO afterBook) {
+        int idx = collectionBooks.indexOf(afterBook);
+        BookTO newBook = new BookTO(nextCollectionId++, "", "", 2026, true, true);
+        if (idx >= 0) {
+            collectionBooks.add(idx + 1, newBook);
+        } else {
+            collectionBooks.add(newBook);
+        }
+        return "";
+    }
+    public String addCollectionRowAtEnd() {
+        collectionBooks.add(new BookTO(nextCollectionId++, "", "", 2026, true, true));
+        return "";
+    }
+    public String deleteCollectionRow(BookTO book) {
+        collectionBooks.remove(book);
+        return "";
+    }
+    public String modifyCollectionRow(BookTO book) {
+        book.setEdited(true);
+        return "";
+    }
+    public String saveCollectionData() {
+        for (BookTO b : collectionBooks) {
+            b.setEdited(false);
+        }
+        applicationBean.incrementTotalActions();
+        return "";
+    }
+    public String refreshCollectionData() {
+        collectionBooks.clear();
+        collectionBooks.add(new BookTO(1L, "Diuna", "Frank Herbert", 1965, true, false));
+        collectionBooks.add(new BookTO(2L, "Hobbit", "J.R.R. Tolkien", 1937, true, false));
+        collectionBooks.add(new BookTO(3L, "Rok 1984", "George Orwell", 1949, false, false));
+        nextCollectionId = 4L;
+        return "";
     }
 }
